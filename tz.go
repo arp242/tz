@@ -89,6 +89,13 @@ func (t *Zone) UnmarshalText(v []byte) error {
 	return t.Scan(v)
 }
 
+// Offset gets the timezone offset in minutes.
+func (t Zone) Offset() int {
+	now := time.Now().In(t.Location)
+	_, offset := now.Zone()
+	return offset / 60
+}
+
 // Value implements the SQL Value function to determine what to store in the DB.
 func (t Zone) Value() (driver.Value, error) {
 	if t.CountryCode == "" || t.Zone == "" {
