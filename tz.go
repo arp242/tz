@@ -90,7 +90,10 @@ func (t *Zone) UnmarshalText(v []byte) error {
 }
 
 // Offset gets the timezone offset in minutes.
-func (t Zone) Offset() int {
+func (t *Zone) Offset() int {
+	if t == nil || t.Location == nil {
+		return 0
+	}
 	now := time.Now().In(t.Location)
 	_, offset := now.Zone()
 	return offset / 60
