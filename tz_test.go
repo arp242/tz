@@ -28,6 +28,10 @@ func TestNew(t *testing.T) {
 			Comments:    "Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)",
 		}, ""},
 
+		{"GB", "UTC", UTC, ""},
+		{"ID", "UTC", UTC, ""},
+		{"", "UTC", UTC, ""},
+
 		{"NL", "Asia/Makassar", nil, "unknown"},
 	}
 

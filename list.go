@@ -16,6 +16,9 @@ func init() {
 	}
 }
 
+// UTC timezone.
+var UTC = &Zone{CountryCode: "", Zone: "UTC", Abbr: "UTC", CountryName: "UTC", Comments: "", Location: time.UTC}
+
 // Zones is a list of all timezones by country.
 var Zones = []*Zone{
 	{CountryCode: "AF", Zone: "Asia/Kabul", Abbr: "", CountryName: "Afghanistan", Comments: ""},

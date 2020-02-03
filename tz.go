@@ -31,6 +31,10 @@ func New(ccode, zone string) (*Zone, error) {
 		return nil, err
 	}
 
+	if zone == "UTC" {
+		return UTC, nil
+	}
+
 	for _, z := range Zones {
 		if (ccode == "" || z.CountryCode == ccode) && z.Zone == zone {
 			return z, nil
