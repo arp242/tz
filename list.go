@@ -1,24 +1,5 @@
 package tz
 
-import (
-	"fmt"
-	"time"
-)
-
-// Add time.Location; also serves as sanity-check on startup.
-func init() {
-	for _, z := range Zones {
-		var err error
-		z.Location, err = time.LoadLocation(z.Zone)
-		if err != nil {
-			panic(fmt.Sprintf("tz.init: %s", err))
-		}
-	}
-}
-
-// UTC timezone.
-var UTC = &Zone{CountryCode: "", Zone: "UTC", Abbr: "UTC", CountryName: "UTC", Comments: "", Location: time.UTC}
-
 // Zones is a list of all timezones by country.
 var Zones = []*Zone{
 	{CountryCode: "AF", Zone: "Asia/Kabul", Abbr: "", CountryName: "Afghanistan", Comments: ""},

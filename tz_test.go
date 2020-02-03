@@ -9,30 +9,21 @@ import (
 func TestNew(t *testing.T) {
 	tests := []struct {
 		inC, inZ string
-		want     *Zone
+		want     string
 		wantErr  string
 	}{
-		{"ID", "Asia/Makassar", &Zone{
-			CountryCode: "ID",
-			Zone:        "Asia/Makassar",
-			Abbr:        "WITA",
-			CountryName: "Indonesia",
-			Comments:    "Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)",
-		}, ""},
+		{"ID", "Asia/Makassar", "ID.Asia/Makassar", ""},
+		{"", "Asia/Makassar", "ID.Asia/Makassar", ""},
+		{"NL", "Asia/Makassar", "ID.Asia/Makassar", ""},
 
-		{"", "Asia/Makassar", &Zone{
-			CountryCode: "ID",
-			Zone:        "Asia/Makassar",
-			Abbr:        "WITA",
-			CountryName: "Indonesia",
-			Comments:    "Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)",
-		}, ""},
+		{"GB", "UTC", ".UTC", ""},
+		{"ID", "UTC", ".UTC", ""},
+		{"", "UTC", ".UTC", ""},
 
-		{"GB", "UTC", UTC, ""},
-		{"ID", "UTC", UTC, ""},
-		{"", "UTC", UTC, ""},
+		{"", "CET", "FR.Europe/Paris", ""},
+		{"", "Asia/Saigon", "VN.Asia/Ho_Chi_Minh", ""},
 
-		{"NL", "Asia/Makassar", nil, "unknown"},
+		{"ID", "Asia/Denpasar", "", "unknown"},
 	}
 
 	for _, tt := range tests {
@@ -42,10 +33,9 @@ func TestNew(t *testing.T) {
 				t.Fatalf("\nout:  %#v\nwant: %#v\n", err, tt.wantErr)
 			}
 
-			out := fmt.Sprintf("%v", z)
-			want := fmt.Sprintf("%v", tt.want)
-			if out != want {
-				t.Errorf("\nout:  %s\nwant: %s", out, want)
+			out := fmt.Sprintf("%s", z)
+			if out != tt.want {
+				t.Errorf("\nout:  %s\nwant: %s", out, tt.want)
 			}
 		})
 	}

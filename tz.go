@@ -23,24 +23,30 @@ type Zone struct {
 	display string // cached Display()
 }
 
-// New timezone from country code and zone name. If the country code is empty it
-// will load the first zone found.
+// New timezone from country code and zone name. The country code is only
+// informative, and may be blank or wrong, in which case it will load the first
+// zone found.
 func New(ccode, zone string) (*Zone, error) {
-	_, err := time.LoadLocation(zone)
-	if err != nil {
-		return nil, err
-	}
-
 	if zone == "UTC" {
 		return UTC, nil
 	}
+	if a, ok := aliases[zone]; ok {
+		zone = a
+	}
 
+	var match *Zone
 	for _, z := range Zones {
 		if (ccode == "" || z.CountryCode == ccode) && z.Zone == zone {
 			return z, nil
 		}
+		if match == nil && z.Zone == zone {
+			match = z
+		}
 	}
 
+	if match != nil {
+		return match, nil
+	}
 	return nil, fmt.Errorf("unknown timezone: %q %q", ccode, zone)
 }
 
