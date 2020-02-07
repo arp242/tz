@@ -12,18 +12,20 @@ func TestNew(t *testing.T) {
 		want     string
 		wantErr  string
 	}{
-		{"ID", "Asia/Makassar", "ID.Asia/Makassar", ""},
-		{"", "Asia/Makassar", "ID.Asia/Makassar", ""},
-		{"NL", "Asia/Makassar", "ID.Asia/Makassar", ""},
+		{"ID", "Asia/Makassar", "ID.Asia/Makassar", ""}, // Country+Zone
+		{"", "Asia/Makassar", "ID.Asia/Makassar", ""},   // Just zone
+		{"NL", "Asia/Makassar", "ID.Asia/Makassar", ""}, // Zone with wrong country
+		{"NL", "", "NL.Europe/Amsterdam", ""},           // Just country
+		{"ID", "", "ID.Asia/Jayapura", ""},              // Just country
 
-		{"GB", "UTC", ".UTC", ""},
+		{"GB", "UTC", ".UTC", ""}, // Various way of sending UTC
 		{"ID", "UTC", ".UTC", ""},
 		{"", "UTC", ".UTC", ""},
 
-		{"", "CET", "FR.Europe/Paris", ""},
-		{"", "Asia/Saigon", "VN.Asia/Ho_Chi_Minh", ""},
+		{"", "CET", "FR.Europe/Paris", ""},             // Alias
+		{"", "Asia/Saigon", "VN.Asia/Ho_Chi_Minh", ""}, // Alias
 
-		{"ID", "Asia/Denpasar", "", "unknown"},
+		{"ID", "Asia/Denpasar", "", "unknown"}, // Doesn't exist
 	}
 
 	for _, tt := range tests {

@@ -34,6 +34,16 @@ func New(ccode, zone string) (*Zone, error) {
 		zone = a
 	}
 
+	// No zone name but country given; just get the first zone for that country,
+	// which is better than nothing.
+	if zone == "" && ccode != "" {
+		for _, z := range Zones {
+			if z.CountryCode == ccode {
+				return z, nil
+			}
+		}
+	}
+
 	var match *Zone
 	for _, z := range Zones {
 		if (ccode == "" || z.CountryCode == ccode) && z.Zone == zone {
