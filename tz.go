@@ -60,6 +60,15 @@ func New(ccode, zone string) (*Zone, error) {
 	return nil, fmt.Errorf("unknown timezone: %q %q", ccode, zone)
 }
 
+// MustNew behaves like New(), but will panic on errors.
+func MustNew(ccode, zone string) *Zone {
+	z, err := New(ccode, zone)
+	if err != nil {
+		panic(fmt.Errorf("tz.MustNew: %w", err))
+	}
+	return z
+}
+
 // Loc gets the time.Location, or UTC if it's not set.
 func (t *Zone) Loc() *time.Location {
 	if t == nil || t.Location == nil {

@@ -39,6 +39,21 @@ func TestNew(t *testing.T) {
 			if out != tt.want {
 				t.Errorf("\nout:  %s\nwant: %s", out, tt.want)
 			}
+
+			if tt.wantErr != "" {
+				t.Run("MustNew", func(t *testing.T) {
+					defer func() {
+						if recover() == nil {
+							t.Error("recover() is nil")
+						}
+					}()
+					z := MustNew(tt.inC, tt.inZ)
+					out := fmt.Sprintf("%s", z)
+					if out != tt.want {
+						t.Errorf("\nout:  %s\nwant: %s", out, tt.want)
+					}
+				})
+			}
 		})
 	}
 }
