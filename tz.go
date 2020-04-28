@@ -6,6 +6,7 @@ package tz
 import (
 	"database/sql/driver"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 )
@@ -126,6 +127,16 @@ func (t *Zone) Offset() int {
 	now := time.Now().In(t.Location)
 	_, offset := now.Zone()
 	return offset / 60
+}
+
+// OffsetDisplay gets the offset as a human readable string (+8:00. -7:30, UTC).
+func (t *Zone) OffsetDisplay() string {
+	o := t.Offset()
+	if o == 0 {
+		return "UTC"
+	}
+	m := o % 60
+	return fmt.Sprintf("UTC %+.0f:%02d", math.Floor(float64(o)/60), m)
 }
 
 // Value implements the SQL Value function to determine what to store in the DB.
