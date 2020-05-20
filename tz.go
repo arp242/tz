@@ -129,7 +129,21 @@ func (t *Zone) Offset() int {
 	return offset / 60
 }
 
-// OffsetDisplay gets the offset as a human readable string (+8:00. -7:30, UTC).
+// OffsetRFC3339 gets the offset as a RFC3339 string.
+//
+// For example "+08:00", "-07:30", "UTC".
+func (t *Zone) OffsetRFC3339() string {
+	o := t.Offset()
+	if o == 0 {
+		return "UTC"
+	}
+	m := o % 60
+	return fmt.Sprintf("%+03.0f:%02d", math.Floor(float64(o)/60), m)
+}
+
+// OffsetDisplay gets the offset as a human readable string.
+//
+// For example "UTC +8:00", "UTC -7:30", "UTC").
 func (t *Zone) OffsetDisplay() string {
 	o := t.Offset()
 	if o == 0 {

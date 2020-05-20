@@ -58,6 +58,29 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestOffsetRFC3999(t *testing.T) {
+	tests := []struct {
+		in   *Zone
+		want string
+	}{
+		{nil, "UTC"},
+		{MustNew("", "UTC"), "UTC"},
+		{MustNew("", "Europe/London"), "+01:00"},
+		{MustNew("", "America/Chicago"), "-05:00"},
+		{MustNew("", "Australia/Darwin"), "+09:30"},
+		{MustNew("", "Pacific/Auckland"), "+12:00"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.in.String(), func(t *testing.T) {
+			out := tt.in.OffsetRFC3339()
+			if out != tt.want {
+				t.Errorf("\nout:  %s\nwant: %s", out, tt.want)
+			}
+		})
+	}
+}
+
 func TestOffsetDisplay(t *testing.T) {
 	tests := []struct {
 		in   *Zone
@@ -68,6 +91,7 @@ func TestOffsetDisplay(t *testing.T) {
 		{MustNew("", "Europe/London"), "UTC +1:00"},
 		{MustNew("", "America/Chicago"), "UTC -5:00"},
 		{MustNew("", "Australia/Darwin"), "UTC +9:30"},
+		{MustNew("", "Pacific/Auckland"), "UTC +12:00"},
 	}
 
 	for _, tt := range tests {
