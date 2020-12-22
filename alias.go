@@ -2,6 +2,8 @@ package tz
 
 import (
 	"fmt"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -11,7 +13,9 @@ func init() {
 		var err error
 		z.Location, err = time.LoadLocation(z.Zone)
 		if err != nil {
-			panic(fmt.Sprintf("tz.init: %s", err))
+			if strings.Contains(err.Error(), "unknown time zone") {
+				fmt.Fprintf(os.Stderr, "warning: tz.init: %s; you probably need to update your tzdata/zoneinfo\n", err)
+			}
 		}
 	}
 }

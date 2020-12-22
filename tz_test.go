@@ -65,10 +65,8 @@ func TestOffsetRFC3999(t *testing.T) {
 	}{
 		{nil, "UTC"},
 		{MustNew("", "UTC"), "UTC"},
-		{MustNew("", "Europe/London"), "+01:00"},
-		{MustNew("", "America/Chicago"), "-05:00"},
+		{MustNew("", "America/Sao_Paulo"), "-03:00"},
 		{MustNew("", "Australia/Darwin"), "+09:30"},
-		{MustNew("", "Pacific/Auckland"), "+12:00"},
 	}
 
 	for _, tt := range tests {
@@ -88,10 +86,8 @@ func TestOffsetDisplay(t *testing.T) {
 	}{
 		{nil, "UTC"},
 		{MustNew("", "UTC"), "UTC"},
-		{MustNew("", "Europe/London"), "UTC +1:00"},
-		{MustNew("", "America/Chicago"), "UTC -5:00"},
+		{MustNew("", "America/Sao_Paulo"), "UTC -3:00"},
 		{MustNew("", "Australia/Darwin"), "UTC +9:30"},
-		{MustNew("", "Pacific/Auckland"), "UTC +12:00"},
 	}
 
 	for _, tt := range tests {
