@@ -8,14 +8,15 @@ import (
 	"os/exec"
 	"sort"
 	"strings"
+	"time"
 )
 
 type Zone struct {
-	CountryCode string // ID
-	Zone        string // Asia/Makassar
-	Abbr        string // WITA
-	CountryName string // Indonesia
-	Comments    string // Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)
+	CountryCode string   // ID
+	Zone        string   // Asia/Makassar
+	Abbr        []string // WITA
+	CountryName string   // Indonesia
+	Comments    string   // Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)
 }
 
 func readISO() map[string]string {
@@ -41,20 +42,69 @@ func readISO() map[string]string {
 	return r
 }
 
-func readAbbr(names []string) map[string]string {
-	out, err := exec.Command("zdump", names...).Output()
+// TODO: this is wrong, as it may return "CET" or "CEST" depending on DST:
+//
+// [~]% zdump -v -c 2019,2020 Europe/Berlin Pacific/Auckland
+// Europe/Berlin     -9223372036854775808 = NULL
+// Europe/Berlin     -9223372036854689408 = NULL
+// Europe/Berlin     Sun Mar 31 00:59:59 2019 UT = Sun Mar 31 01:59:59 2019 CET isdst=0 gmtoff=3600
+// Europe/Berlin     Sun Mar 31 01:00:00 2019 UT = Sun Mar 31 03:00:00 2019 CEST isdst=1 gmtoff=7200
+// Europe/Berlin     Sun Oct 27 00:59:59 2019 UT = Sun Oct 27 02:59:59 2019 CEST isdst=1 gmtoff=7200
+// Europe/Berlin     Sun Oct 27 01:00:00 2019 UT = Sun Oct 27 02:00:00 2019 CET isdst=0 gmtoff=3600
+// Europe/Berlin     9223372036854689407 = NULL
+// Europe/Berlin     9223372036854775807 = NULL
+// Pacific/Auckland  -9223372036854775808 = NULL
+// Pacific/Auckland  -9223372036854689408 = NULL
+// Pacific/Auckland  Sat Apr  6 13:59:59 2019 UT = Sun Apr  7 02:59:59 2019 NZDT isdst=1 gmtoff=46800
+// Pacific/Auckland  Sat Apr  6 14:00:00 2019 UT = Sun Apr  7 02:00:00 2019 NZST isdst=0 gmtoff=43200
+// Pacific/Auckland  Sat Sep 28 13:59:59 2019 UT = Sun Sep 29 01:59:59 2019 NZST isdst=0 gmtoff=43200
+// Pacific/Auckland  Sat Sep 28 14:00:00 2019 UT = Sun Sep 29 03:00:00 2019 NZDT isdst=1 gmtoff=46800
+// Pacific/Auckland  9223372036854689407 = NULL
+// Pacific/Auckland  9223372036854775807 = NULL
+//
+// [~]% zdump -v -c 2019,2020 Europe/Berlin Pacific/Auckland | grep gmtoff= | awk '{print $14 " " $15}' | sort -u
+// CEST isdst=1
+// CET isdst=0
+// NZDT isdst=1
+// NZST isdst=0
+func readAbbr(names []string) map[string][]string {
+	f := fmt.Sprintf("-Vc%s,%s", time.Now().UTC().Format("2006"), time.Now().Add(365*time.Hour*24).UTC().Format("2006"))
+	out, err := exec.Command("zdump", append([]string{f}, names...)...).Output()
 	if err != nil {
 		panic(err)
 	}
 
-	r := make(map[string]string)
+	r := make(map[string][]string)
 	for _, line := range strings.Split(string(out), "\n") {
 		f := strings.Fields(line)
-		if len(f) > 5 && f[6][0] != '-' && f[6][0] != '+' {
-			r[f[0]] = f[6]
+		if len(f) < 13 {
+			continue
+		}
+
+		abbr := f[13]
+		if abbr[0] != '-' && abbr[0] != '+' {
+			r[f[0]] = append(r[f[0]], abbr)
 		}
 	}
+
+	for k := range r {
+		r[k] = Uniq(r[k])
+	}
 	return r
+}
+
+// Uniq removes duplicate entries from list; the list will be sorted.
+func Uniq(list []string) []string {
+	sort.Strings(list)
+	var last string
+	l := list[:0]
+	for _, str := range list {
+		if str != last {
+			l = append(l, str)
+		}
+		last = str
+	}
+	return l
 }
 
 func main() {
@@ -106,7 +156,7 @@ func main() {
 
 	abbr := readAbbr(names)
 	for i := range r {
-		if a := abbr[r[i].Zone]; a != "" {
+		if a := abbr[r[i].Zone]; len(a) > 0 {
 			r[i].Abbr = a
 		}
 	}

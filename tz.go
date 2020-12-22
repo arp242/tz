@@ -15,11 +15,11 @@ import (
 type Zone struct {
 	*time.Location
 
-	CountryCode string // ID
-	Zone        string // Asia/Makassar
-	Abbr        string // WITA
-	CountryName string // Indonesia
-	Comments    string // Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)
+	CountryCode string   // ID
+	Zone        string   // Asia/Makassar
+	Abbr        []string // WITA – the correct abbreviation may change depending on the time of year (i.e. CET and CEST, depending on DST).
+	CountryName string   // Indonesia
+	Comments    string   // Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)
 
 	display string // cached Display()
 }
@@ -84,14 +84,15 @@ func (t *Zone) Display() string {
 		return ""
 	}
 
+	// TODO: this could be aligned better with some spaces.
 	if t.display == "" {
 		var b strings.Builder
 		b.WriteString(t.CountryName)
 		b.WriteString(": ")
 		b.WriteString(t.Zone)
-		if t.Abbr != "" {
+		if len(t.Abbr) > 0 {
 			b.WriteString(" (")
-			b.WriteString(t.Abbr)
+			b.WriteString(strings.Join(t.Abbr, ", "))
 			b.WriteString(")")
 		}
 		if t.Comments != "" {
@@ -129,9 +130,10 @@ func (t *Zone) Offset() int {
 	return offset / 60
 }
 
-// OffsetRFC3339 gets the offset as a RFC3339 string.
+// OffsetRFC3339 gets the offset as a RFC3339 string: "+08:00", "-07:30", "UTC".
 //
-// For example "+08:00", "-07:30", "UTC".
+// Note that this displays the offset that is currently valid. For example
+// Europe/Berlin may be +0100 or +0200, depending on whether DST is in effect.
 func (t *Zone) OffsetRFC3339() string {
 	o := t.Offset()
 	if o == 0 {
@@ -141,9 +143,11 @@ func (t *Zone) OffsetRFC3339() string {
 	return fmt.Sprintf("%+03.0f:%02d", math.Floor(float64(o)/60), m)
 }
 
-// OffsetDisplay gets the offset as a human readable string.
+// OffsetDisplay gets the offset as a human readable string: "UTC +8:00", "UTC
+// -7:30", "UTC".
 //
-// For example "UTC +8:00", "UTC -7:30", "UTC").
+// Note that this displays the offset that is currently valid. For example
+// Europe/Berlin may be +0100 or +0200, depending on whether DST is in effect.
 func (t *Zone) OffsetDisplay() string {
 	o := t.Offset()
 	if o == 0 {

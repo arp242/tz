@@ -21,7 +21,7 @@ func init() {
 }
 
 // UTC timezone.
-var UTC = &Zone{CountryCode: "", Zone: "UTC", Abbr: "UTC", CountryName: "UTC", Comments: "", Location: time.UTC}
+var UTC = &Zone{CountryCode: "", Zone: "UTC", Abbr: []string{"UTC"}, CountryName: "UTC", Comments: "", Location: time.UTC}
 
 var aliases = map[string]string{
 	// Not in the tzdb and "deprecated", but some browsers send this.
