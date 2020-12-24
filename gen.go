@@ -42,31 +42,6 @@ func readISO() map[string]string {
 	return r
 }
 
-// TODO: this is wrong, as it may return "CET" or "CEST" depending on DST:
-//
-// [~]% zdump -v -c 2019,2020 Europe/Berlin Pacific/Auckland
-// Europe/Berlin     -9223372036854775808 = NULL
-// Europe/Berlin     -9223372036854689408 = NULL
-// Europe/Berlin     Sun Mar 31 00:59:59 2019 UT = Sun Mar 31 01:59:59 2019 CET isdst=0 gmtoff=3600
-// Europe/Berlin     Sun Mar 31 01:00:00 2019 UT = Sun Mar 31 03:00:00 2019 CEST isdst=1 gmtoff=7200
-// Europe/Berlin     Sun Oct 27 00:59:59 2019 UT = Sun Oct 27 02:59:59 2019 CEST isdst=1 gmtoff=7200
-// Europe/Berlin     Sun Oct 27 01:00:00 2019 UT = Sun Oct 27 02:00:00 2019 CET isdst=0 gmtoff=3600
-// Europe/Berlin     9223372036854689407 = NULL
-// Europe/Berlin     9223372036854775807 = NULL
-// Pacific/Auckland  -9223372036854775808 = NULL
-// Pacific/Auckland  -9223372036854689408 = NULL
-// Pacific/Auckland  Sat Apr  6 13:59:59 2019 UT = Sun Apr  7 02:59:59 2019 NZDT isdst=1 gmtoff=46800
-// Pacific/Auckland  Sat Apr  6 14:00:00 2019 UT = Sun Apr  7 02:00:00 2019 NZST isdst=0 gmtoff=43200
-// Pacific/Auckland  Sat Sep 28 13:59:59 2019 UT = Sun Sep 29 01:59:59 2019 NZST isdst=0 gmtoff=43200
-// Pacific/Auckland  Sat Sep 28 14:00:00 2019 UT = Sun Sep 29 03:00:00 2019 NZDT isdst=1 gmtoff=46800
-// Pacific/Auckland  9223372036854689407 = NULL
-// Pacific/Auckland  9223372036854775807 = NULL
-//
-// [~]% zdump -v -c 2019,2020 Europe/Berlin Pacific/Auckland | grep gmtoff= | awk '{print $14 " " $15}' | sort -u
-// CEST isdst=1
-// CET isdst=0
-// NZDT isdst=1
-// NZST isdst=0
 func readAbbr(names []string) map[string][]string {
 	f := fmt.Sprintf("-Vc%s,%s", time.Now().UTC().Format("2006"), time.Now().Add(365*time.Hour*24).UTC().Format("2006"))
 	out, err := exec.Command("zdump", append([]string{f}, names...)...).Output()
@@ -84,6 +59,20 @@ func readAbbr(names []string) map[string][]string {
 		abbr := f[13]
 		if abbr[0] != '-' && abbr[0] != '+' {
 			r[f[0]] = append(r[f[0]], abbr)
+		}
+	}
+
+	// For zones that don't cange -c2020,2021 returns nothing, so append those
+	// too.
+	out, err = exec.Command("zdump", names...).Output()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, line := range strings.Split(string(out), "\n") {
+		f := strings.Fields(line)
+		if len(f) > 5 && f[6][0] != '-' && f[6][0] != '+' {
+			r[f[0]] = append(r[f[0]], f[6])
 		}
 	}
 
