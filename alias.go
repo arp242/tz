@@ -1,24 +1,8 @@
 package tz
 
 import (
-	"fmt"
-	"os"
-	"strings"
 	"time"
 )
-
-// Add time.Location; also serves as sanity-check on startup.
-func init() {
-	for _, z := range Zones {
-		var err error
-		z.Location, err = time.LoadLocation(z.Zone)
-		if err != nil {
-			if strings.Contains(err.Error(), "unknown time zone") {
-				fmt.Fprintf(os.Stderr, "warning: tz.init: %s; you probably need to update your tzdata/zoneinfo\n", err)
-			}
-		}
-	}
-}
 
 // UTC timezone.
 var UTC = &Zone{CountryCode: "", Zone: "UTC", Abbr: []string{"UTC"}, CountryName: "UTC", Comments: "", Location: time.UTC}

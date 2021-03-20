@@ -7,9 +7,24 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math"
+	"os"
 	"strings"
+	"sync"
 	"time"
 )
+
+// Add time.Location; also serves as sanity-check on startup.
+// func init() {
+// 	for _, z := range Zones {
+// 		var err error
+// 		z.Location, err = time.LoadLocation(z.Zone)
+// 		if err != nil {
+// 			if strings.Contains(err.Error(), "unknown time zone") {
+// 				fmt.Fprintf(os.Stderr, "warning: tz.init: %s; you probably need to update your tzdata/zoneinfo\n", err)
+// 			}
+// 		}
+// 	}
+// }
 
 // Zone represents a time zone.
 type Zone struct {
@@ -24,10 +39,27 @@ type Zone struct {
 	display string // cached Display()
 }
 
+var loadLocationOnce sync.Once
+
 // New timezone from country code and zone name. The country code is only
 // informative, and may be blank or wrong, in which case it will load the first
 // zone found.
 func New(ccode, zone string) (*Zone, error) {
+	// Add time.Location to all the zones. This is about 68k memory without the
+	// loaded zones, and 670k with. Not super huge, but kinda large. Also takes
+	// about 12ms on my laptop.
+	loadLocationOnce.Do(func() {
+		for _, z := range Zones {
+			var err error
+			z.Location, err = time.LoadLocation(z.Zone)
+			if err != nil {
+				if strings.Contains(err.Error(), "unknown time zone") {
+					fmt.Fprintf(os.Stderr, "warning: zgo.at/tz: %s; you probably need to update your tzdata or zoneinfo\n", err)
+				}
+			}
+		}
+	})
+
 	if zone == "UTC" {
 		return UTC, nil
 	}
