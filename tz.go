@@ -1,4 +1,4 @@
-//go:generate sh -c "go run gen.go | gofmt >list.go"
+//go:generate sh -c "go run gen.go > list.go && gofmt -w list.go"
 
 // Package tz contains timezone lists.
 package tz
@@ -212,8 +212,6 @@ func (t *Zone) Scan(v interface{}) error {
 	}
 
 	z, err := New(s[0], s[1])
-	if z != nil {
-		*t = *z
-	}
+	*t = *z
 	return err
 }
