@@ -1,11 +1,10 @@
 //go:build go_run_only
-// +build go_run_only
 
 package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"os/exec"
 	"sort"
 	"strings"
@@ -21,7 +20,7 @@ type Zone struct {
 }
 
 func readISO() map[string]string {
-	f, err := ioutil.ReadFile("/usr/share/zoneinfo/iso3166.tab")
+	f, err := os.ReadFile("/usr/share/zoneinfo/iso3166.tab")
 	if err != nil {
 		panic(err)
 	}
@@ -100,7 +99,7 @@ func Uniq(list []string) []string {
 func main() {
 	iso := readISO()
 
-	f, err := ioutil.ReadFile("/usr/share/zoneinfo/zone1970.tab")
+	f, err := os.ReadFile("/usr/share/zoneinfo/zone1970.tab")
 	if err != nil {
 		panic(err)
 	}

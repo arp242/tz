@@ -198,13 +198,13 @@ func (t Zone) Value() (driver.Value, error) {
 }
 
 // Scan converts the data returned from the DB into the struct.
-func (t *Zone) Scan(v interface{}) error {
+func (t *Zone) Scan(v any) error {
 	var vv string
-	switch v.(type) {
+	switch x := v.(type) {
 	case string:
-		vv = v.(string)
+		vv = x
 	case []byte:
-		vv = string(v.([]byte))
+		vv = string(x)
 	}
 	s := strings.SplitN(vv, ".", 2)
 	if len(s) != 2 {

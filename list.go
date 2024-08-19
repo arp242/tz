@@ -385,7 +385,7 @@ var Zones = []*Zone{
 	{CountryCode: "UA", Zone: "Europe/Simferopol", Abbr: []string{"MSK"}, CountryName: "Ukraine", Comments: "Crimea"},
 	{CountryCode: "UA", Zone: "Europe/Zaporozhye", Abbr: []string{"EEST", "EET"}, CountryName: "Ukraine", Comments: "Zaporozhye and east Lugansk"},
 	{CountryCode: "UA", Zone: "Europe/Uzhgorod", Abbr: []string{"EEST", "EET"}, CountryName: "Ukraine", Comments: "Transcarpathia"},
-	{CountryCode: "UA", Zone: "Europe/Kiev", Abbr: []string{"EEST", "EET"}, CountryName: "Ukraine", Comments: "Ukraine (most areas)"},
+	{CountryCode: "UA", Zone: "Europe/Kyiv", Abbr: []string{"EEST", "EET"}, CountryName: "Ukraine", Comments: "most of Ukraine"},
 	{CountryCode: "AE", Zone: "Asia/Dubai", Abbr: []string(nil), CountryName: "United Arab Emirates", Comments: ""},
 	{CountryCode: "US", Zone: "America/Kentucky/Louisville", Abbr: []string{"EDT", "EST"}, CountryName: "United States", Comments: "Eastern - KY (Louisville area)"},
 	{CountryCode: "US", Zone: "America/Nome", Abbr: []string{"AKDT", "AKST"}, CountryName: "United States", Comments: "Alaska (west)"},

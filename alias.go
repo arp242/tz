@@ -47,6 +47,8 @@ var aliases = map[string]string{
 
 	// Extracted from tzdb with:
 	// grep -h '^Link' *.zi | sed -E 's/\s+#.*//; s/\s+/ /g' | sort -u | sed -E 's/Link (.*?) (.*?)/"\2": "\1",/' |
+	"Europe/Kiev": "Europe/Kyiv",
+
 	"Africa/Bamako":                    "Africa/Abidjan",
 	"Africa/Banjul":                    "Africa/Abidjan",
 	"Africa/Conakry":                   "Africa/Abidjan",

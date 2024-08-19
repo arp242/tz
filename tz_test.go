@@ -1,7 +1,6 @@
 package tz
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
@@ -35,7 +34,7 @@ func TestNew(t *testing.T) {
 				t.Fatalf("\nout:  %#v\nwant: %#v\n", err, tt.wantErr)
 			}
 
-			out := fmt.Sprintf("%s", z)
+			out := z.String()
 			if out != tt.want {
 				t.Errorf("\nout:  %s\nwant: %s", out, tt.want)
 			}
@@ -48,7 +47,7 @@ func TestNew(t *testing.T) {
 						}
 					}()
 					z := MustNew(tt.inC, tt.inZ)
-					out := fmt.Sprintf("%s", z)
+					out := z.String()
 					if out != tt.want {
 						t.Errorf("\nout:  %s\nwant: %s", out, tt.want)
 					}
