@@ -1,14 +1,10 @@
 package tz
 
-import (
-	"time"
-)
-
-// UTC timezone.
-var UTC = &Zone{CountryCode: "", Zone: "UTC", Abbr: []string{"UTC"}, CountryName: "UTC", Comments: "", Location: time.UTC}
-
 var aliases = map[string]string{
 	// Extracted from tzdb with:
+	//
+	// TODO: gen.go should generate this.
+	//
 	// egrep -h '^L(ink)? ' /usr/share/zoneinfo/tzdata.zi |
 	//   sed -E 's/\s+#.*//; s/\s+/ /g' |
 	//   sort -u |

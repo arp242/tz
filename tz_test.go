@@ -14,17 +14,29 @@ func TestNew(t *testing.T) {
 		{"ID", "Asia/Makassar", "ID.Asia/Makassar", ""}, // Country+Zone
 		{"", "Asia/Makassar", "ID.Asia/Makassar", ""},   // Just zone
 		{"NL", "Asia/Makassar", "ID.Asia/Makassar", ""}, // Zone with wrong country
-		{"NL", "", "NL.Europe/Amsterdam", ""},           // Just country
-		{"ID", "", "ID.Asia/Jayapura", ""},              // Just country
+		{"NL", "", "NL.Europe/Brussels", ""},            // Just country
+		{"ID", "", "ID.Asia/Jakarta", ""},               // Just country
 
 		{"GB", "UTC", ".UTC", ""}, // Various way of sending UTC
 		{"ID", "UTC", ".UTC", ""},
 		{"", "UTC", ".UTC", ""},
 
-		{"", "CET", "FR.Europe/Paris", ""},             // Alias
+		{"", "CET", "BE.Europe/Brussels", ""},          // Alias
 		{"", "Asia/Saigon", "VN.Asia/Ho_Chi_Minh", ""}, // Alias
 
 		{"ID", "Asia/Denpasar", "", "unknown"}, // Doesn't exist
+
+		{"", "Etc/GMT", ".UTC", ""},
+		{"", "Etc/UTC", ".UTC", ""},
+		{"", "Etc/Unknown", ".UTC", ""},
+		{"", "Etc/XXX", "", "invalid Etc/"},
+
+		{"SG", "Etc/GMT-8", "SG.Asia/Singapore", ""},
+		{"IT", "Etc/GMT-1", "IT.Europe/Rome", ""},
+		{"MX", "Etc/GMT+7", "MX.America/Ciudad_Juarez", ""},
+		{"JO", "Etc/GMT-3", "JO.Asia/Amman", ""},
+		{"SG", "Etc/GMT-10", "SG.Asia/Singapore", ""}, // Invalid country/offset
+		{"", "Etc/GMT-10", "", "unknown timezone"},
 	}
 
 	for _, tt := range tests {

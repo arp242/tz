@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -39,6 +40,10 @@ type Zone struct {
 	display string // cached Display()
 }
 
+// UTC timezone.
+var UTC = &Zone{CountryCode: "", Zone: "UTC", Abbr: []string{"UTC"},
+	CountryName: "UTC", Comments: "", Location: time.UTC}
+
 var loadLocationOnce sync.Once
 
 // New timezone from country code and zone name. The country code is only
@@ -65,6 +70,39 @@ func New(ccode, zone string) (*Zone, error) {
 	}
 	if a, ok := aliases[zone]; ok {
 		zone = a
+	}
+	if strings.HasPrefix(zone, "Etc/") {
+		zone = zone[4:]
+		if zone == "UTC" || zone == "GMT" || zone == "Unknown" {
+			return UTC, nil
+		}
+		if !strings.HasPrefix(zone, "GMT") {
+			return nil, fmt.Errorf("invalid Etc/ timezone: %q", zone)
+		}
+		o, err := strconv.ParseInt(zone[3:], 10, 8)
+		if err != nil {
+			return nil, err
+		}
+		off := int(o) * -60 // + and - are reversed in Etc/ listings
+
+		// If we have a country match the first one for this country that
+		// corresponds to the offset.
+		for _, z := range Zones {
+			if z.CountryCode == ccode && z.Offset() == off {
+				return z, nil
+			}
+		}
+		// No matches for this offset, which shouldn't happen, but return the
+		// first for this country.
+		if ccode != "" {
+			for _, z := range Zones {
+				if z.CountryCode == ccode {
+					return z, nil
+				}
+			}
+		}
+
+		return nil, fmt.Errorf("unknown timezone: %q %q", ccode, zone)
 	}
 
 	// No zone name but country given; just get the first zone for that country,
