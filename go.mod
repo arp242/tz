@@ -1,3 +1,3 @@
 module zgo.at/tz
 
-go 1.19
+go 1.23

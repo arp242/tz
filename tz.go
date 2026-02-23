@@ -244,12 +244,12 @@ func (t *Zone) Scan(v any) error {
 	case []byte:
 		vv = string(x)
 	}
-	s := strings.SplitN(vv, ".", 2)
-	if len(s) != 2 {
+	ccode, zone, ok := strings.Cut(vv, ".")
+	if !ok {
 		return fmt.Errorf("invalid value: %q", vv)
 	}
 
-	z, err := New(s[0], s[1])
+	z, err := New(ccode, zone)
 	if z != nil {
 		*t = *z
 	}
