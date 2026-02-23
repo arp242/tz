@@ -135,13 +135,8 @@ func main() {
 			})
 		}
 	}
-	sort.Slice(r, func(i, j int) bool {
-		return r[i].CountryName < r[j].CountryName
-	})
-	// Move Åland Islands to proper location; don't want to bother with unicode
-	// collate just for this.
-	last := r[len(r)-1]
-	r = append([]Zone{r[0]}, append([]Zone{last}, r[1:len(r)-1]...)...)
+	sort.Slice(r, func(i, j int) bool { return r[i].Zone < r[j].Zone })
+	sort.SliceStable(r, func(i, j int) bool { return r[i].CountryCode < r[j].CountryCode })
 
 	abbr := readAbbr(names)
 	for i := range r {

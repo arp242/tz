@@ -190,7 +190,7 @@ func (t *Zone) UnmarshalText(v []byte) error {
 	return t.Scan(v)
 }
 
-// Offset gets the timezone offset.
+// Offset gets the timezone offset in minutes.
 func (t *Zone) Offset() int {
 	if t == nil || t.Location == nil {
 		return 0
