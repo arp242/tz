@@ -3,6 +3,7 @@ package tz
 import (
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestNew(t *testing.T) {
@@ -69,43 +70,33 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestOffsetRFC3999(t *testing.T) {
+func TestOffset(t *testing.T) {
 	tests := []struct {
-		in   *Zone
-		want string
+		in           *Zone
+		want         int
+		wantDuration time.Duration
+		wantRFC      string
+		wantDisplay  string
 	}{
-		{nil, "UTC"},
-		{MustNew("", "UTC"), "UTC"},
-		{MustNew("", "America/Sao_Paulo"), "-03:00"},
-		{MustNew("", "Australia/Darwin"), "+09:30"},
+		{nil, 0, 0, "UTC", "UTC"},
+		{MustNew("", "UTC"), 0, 0, "UTC", "UTC"},
+		{MustNew("", "America/Sao_Paulo"), -180, -3 * time.Hour, "-03:00", "UTC -3:00"},
+		{MustNew("", "Australia/Darwin"), 570, 570 * time.Minute, "+09:30", "UTC +9:30"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.in.String(), func(t *testing.T) {
-			out := tt.in.OffsetRFC3339()
-			if out != tt.want {
-				t.Errorf("\nout:  %s\nwant: %s", out, tt.want)
+			if have := tt.in.Offset(); have != tt.want {
+				t.Errorf("\nhave: %v\nwant: %v", have, tt.want)
 			}
-		})
-	}
-}
-
-func TestOffsetDisplay(t *testing.T) {
-	tests := []struct {
-		in   *Zone
-		want string
-	}{
-		{nil, "UTC"},
-		{MustNew("", "UTC"), "UTC"},
-		{MustNew("", "America/Sao_Paulo"), "UTC -3:00"},
-		{MustNew("", "Australia/Darwin"), "UTC +9:30"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.in.String(), func(t *testing.T) {
-			out := tt.in.OffsetDisplay()
-			if out != tt.want {
-				t.Errorf("\nout:  %s\nwant: %s", out, tt.want)
+			if have := tt.in.OffsetDuration(); have != tt.wantDuration {
+				t.Errorf("\nhave: %v\nwant: %v", have, tt.wantDuration)
+			}
+			if have := tt.in.OffsetRFC3339(); have != tt.wantRFC {
+				t.Errorf("\nhave: %v\nwant: %v", have, tt.wantRFC)
+			}
+			if have := tt.in.OffsetDisplay(); have != tt.wantDisplay {
+				t.Errorf("\nhave: %v\nwant: %v", have, tt.wantDisplay)
 			}
 		})
 	}

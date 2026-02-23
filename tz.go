@@ -190,7 +190,7 @@ func (t *Zone) UnmarshalText(v []byte) error {
 	return t.Scan(v)
 }
 
-// Offset gets the timezone offset in minutes.
+// Offset gets the timezone offset.
 func (t *Zone) Offset() int {
 	if t == nil || t.Location == nil {
 		return 0
@@ -198,6 +198,14 @@ func (t *Zone) Offset() int {
 	now := time.Now().In(t.Location)
 	_, offset := now.Zone()
 	return offset / 60
+}
+
+// OffsetDuration gets the timezone offset.
+func (t *Zone) OffsetDuration() time.Duration {
+	if t == nil || t.Location == nil {
+		return 0
+	}
+	return time.Duration(t.Offset()) * time.Minute
 }
 
 // OffsetRFC3339 gets the offset as a RFC3339 string: "+08:00", "-07:30", "UTC".
